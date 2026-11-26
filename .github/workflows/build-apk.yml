@@ -25,7 +25,6 @@ jobs:
 
       - name: Set up Android SDK and accept licenses
         run: |
-          echo "ANDROID_HOME=$ANDROID_HOME"
           SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
           set +o pipefail
           yes | "$SDKMANAGER" --licenses > /dev/null 2>&1 || true
@@ -39,25 +38,9 @@ jobs:
           chmod +x ./gradlew
           ./gradlew assembleDebug --no-daemon --stacktrace
 
-      - name: Collect outputs
-        run: |
-          mkdir -p dist
-          cp app/build/outputs/apk/debug/app-debug.apk dist/Cheeseboard-debug.apk
-          zip -r dist/Cheeseboard-Source.zip . \
-            -x ".git/*" "dist/*" "*/build/*" "build/*" ".gradle/*" "*/.gradle/*" \
-               ".idea/*" "*.iml" "local.properties" "*.apk"
-          ls -lh dist
-
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
           name: Cheeseboard-debug-apk
-          path: dist/Cheeseboard-debug.apk
-          if-no-files-found: error
-
-      - name: Upload source ZIP
-        uses: actions/upload-artifact@v4
-        with:
-          name: Cheeseboard-Source
-          path: dist/Cheeseboard-Source.zip
+          path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
